@@ -596,12 +596,23 @@ impl WorkspaceIndex {
             .clone()
             .unwrap_or_else(|| symbol.fqn.clone());
         let target = simple_type_name(&owner);
-        let implementors: Vec<String> = self
-            .type_edges
-            .iter()
-            .filter(|edge| simple_type_name(&edge.parent_fqn) == target)
-            .map(|edge| edge.child_fqn.clone())
-            .collect();
+        let mut implementors = HashSet::new();
+        let mut pending = vec![target.to_string()];
+        let mut visited = HashSet::new();
+        while let Some(parent) = pending.pop() {
+            if !visited.insert(parent.clone()) {
+                continue;
+            }
+            for edge in self
+                .type_edges
+                .iter()
+                .filter(|edge| simple_type_name(&edge.parent_fqn) == parent)
+            {
+                if edge.child_fqn != owner && implementors.insert(edge.child_fqn.clone()) {
+                    pending.push(simple_type_name(&edge.child_fqn).to_string());
+                }
+            }
+        }
 
         let mut out = Vec::new();
         for candidate in self.symbols.values() {
@@ -612,9 +623,9 @@ impl WorkspaceIndex {
             let is_implementor = candidate
                 .owner_fqn
                 .as_deref()
-                .map(|owner| implementors.iter().any(|fqn| fqn == owner))
+                .map(|owner| implementors.contains(owner))
                 .unwrap_or(false);
-            let type_match = is_type && implementors.iter().any(|fqn| fqn == &candidate.fqn);
+            let type_match = is_type && implementors.contains(&candidate.fqn);
             let method_match = !is_type && is_implementor && candidate.name == symbol.name;
             if type_match || method_match {
                 out.push(candidate.clone());
@@ -976,6 +987,94 @@ mod tests {
         assert!(usages
             .iter()
             .any(|occurrence| occurrence.uri.contains("UserServiceImpl")));
+    }
+
+    #[test]
+    fn implementations_cross_maven_module_boundaries() {
+        let workspace = TempWorkspace::new("cross-module-implementations");
+        workspace.write(
+            "api-module/src/main/java/demo/api/UserService.java",
+            "package demo.api;\npublic interface UserService {\n    String findById(int id);\n}\n",
+        );
+        workspace.write(
+            "service-module/src/main/java/demo/service/UserServiceImpl.java",
+            "package demo.service;\nimport demo.api.UserService;\npublic class UserServiceImpl implements UserService {\n    public String findById(int id) { return \"x\"; }\n}\n",
+        );
+
+        let mut index = WorkspaceIndex::open(&workspace.0, &[]);
+        let report = index.scan();
+        assert_eq!(report.files, 2, "report={report:?}");
+
+        let interface = index
+            .symbols_named("UserService")
+            .into_iter()
+            .find(|symbol| symbol.fqn == "demo.api.UserService")
+            .expect("interface in api module");
+        let implementations = index.implementations(interface.id);
+        assert!(
+            implementations
+                .iter()
+                .any(|symbol| symbol.fqn == "demo.service.UserServiceImpl"),
+            "implementations={implementations:?}"
+        );
+
+        let method = index
+            .symbols_named("findById")
+            .into_iter()
+            .find(|symbol| symbol.owner_fqn.as_deref() == Some("demo.api.UserService"))
+            .expect("interface method");
+        let implementations = index.implementations(method.id);
+        assert!(
+            implementations.iter().any(|symbol| {
+                symbol.owner_fqn.as_deref() == Some("demo.service.UserServiceImpl")
+            }),
+            "method implementations={implementations:?}"
+        );
+    }
+
+    #[test]
+    fn implementations_cross_modules_through_intermediate_interface() {
+        let workspace = TempWorkspace::new("cross-module-transitive-implementations");
+        workspace.write(
+            "api-module/src/main/java/demo/api/UserService.java",
+            "package demo.api;\npublic interface UserService {\n    String findById(int id);\n}\n",
+        );
+        workspace.write(
+            "service-api-module/src/main/java/demo/service/InternalUserService.java",
+            "package demo.service;\nimport demo.api.UserService;\npublic interface InternalUserService extends UserService {}\n",
+        );
+        workspace.write(
+            "service-impl-module/src/main/java/demo/service/impl/UserServiceImpl.java",
+            "package demo.service.impl;\nimport demo.service.InternalUserService;\npublic class UserServiceImpl implements InternalUserService {\n    public String findById(int id) { return \"x\"; }\n}\n",
+        );
+
+        let mut index = WorkspaceIndex::open(&workspace.0, &[]);
+        assert_eq!(index.scan().files, 3);
+        let interface = index
+            .symbols_named("UserService")
+            .into_iter()
+            .find(|symbol| symbol.fqn == "demo.api.UserService")
+            .expect("interface in api module");
+        let implementations = index.implementations(interface.id);
+        assert!(
+            implementations
+                .iter()
+                .any(|symbol| symbol.fqn == "demo.service.impl.UserServiceImpl"),
+            "transitive implementations={implementations:?}"
+        );
+
+        let method = index
+            .symbols_named("findById")
+            .into_iter()
+            .find(|symbol| symbol.owner_fqn.as_deref() == Some("demo.api.UserService"))
+            .expect("interface method");
+        let usages = index.references(method.id, None, true);
+        assert!(
+            usages
+                .iter()
+                .any(|occurrence| occurrence.uri.contains("UserServiceImpl")),
+            "cross-module override usages={usages:?}"
+        );
     }
 
     #[test]
