@@ -1,0 +1,11 @@
+[package]
+name = "nav-maven"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+nav-core = { workspace = true }
+roxmltree = "0.21.2"
+walkdir = "2.5.0"

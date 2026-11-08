@@ -1,0 +1,23 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/nav-core",
+    "crates/nav-java",
+    "crates/nav-index",
+    "crates/nav-maven",
+    "crates/nav-jar",
+    "crates/ld-java-analyze",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+license = "MIT"
+
+[workspace.dependencies]
+nav-core = { path = "crates/nav-core" }
+nav-java = { path = "crates/nav-java" }
+nav-index = { path = "crates/nav-index" }
+nav-maven = { path = "crates/nav-maven" }
+nav-jar = { path = "crates/nav-jar" }

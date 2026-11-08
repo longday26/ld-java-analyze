@@ -1,0 +1,130 @@
+{
+  "name": "ld-java-analyze",
+  "displayName": "ld-java-analyze",
+  "description": "Java 8 / Maven 代码导航：定义、引用、按目录过滤引用、MyBatis XML 跳转、Lombok 合成符号、JAR 源码优先。",
+  "version": "0.1.0",
+  "publisher": "local",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onLanguage:java",
+    "onLanguage:xml",
+    "onCommand:ld-java-analyze.referencesInPaths",
+    "onCommand:ld-java-analyze.setReferenceRoots",
+    "onCommand:ld-java-analyze.jarCandidates",
+    "onCommand:ld-java-analyze.editExcludeRules",
+    "onCommand:ld-java-analyze.setLogDir",
+    "onCommand:ld-java-analyze.reindex",
+    "onCommand:ld-java-analyze.stats",
+    "onCommand:ld-java-analyze.selfTest"
+  ],
+  "contributes": {
+    "configuration": {
+      "title": "ld-java-analyze",
+      "properties": {
+        "ld-java-analyze.serverPath": {
+          "type": "string",
+          "default": "",
+          "description": "Rust LSP 可执行文件绝对路径。留空时优先使用扩展自带的 server/ld-java-analyze，其次回退到开发目录 ../../target/debug/ld-java-analyze。"
+        },
+        "ld-java-analyze.referenceRoots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "引用搜索的过滤目录（相对工作区或绝对路径）；留空表示整个工作区。"
+        },
+        "ld-java-analyze.excludeRules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "markdownDescription": "扫描排除规则（`.gitignore` 风格，按**目录名/文件名**匹配）。支持 `#` 注释、`*` / `?` 通配、`!` 反选；`generated/` 或 `dir:generated` 只匹配目录名，`file:*.generated.java` 只匹配文件名，不带前缀则两者都匹配。也可在工作区的 `.ld-java-analyze/ignore` 文件中书写。"
+        },
+        "ld-java-analyze.useBuiltinExcludes": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否启用内置目录排除（.git / .idea / .vscode / target / build / out / node_modules / dist 等）。`.ld-java-analyze` 为状态目录，始终排除且不能用 ! 反选。"
+        },
+        "ld-java-analyze.logDir": {
+          "type": "string",
+          "default": "",
+          "description": "日志输出目录。留空表示不写日志（默认）；填绝对路径直接生效，填相对路径按工作区根解析，例如 `.ld-java-analyze/logs`。按天分文件，最多保留 7 天，LSP 每次启动自动清理历史日志。"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "ld-java-analyze.referencesInPaths",
+        "title": "ld-java-analyze: 在指定目录下查找引用"
+      },
+      {
+        "command": "ld-java-analyze.setReferenceRoots",
+        "title": "ld-java-analyze: 设置引用过滤目录"
+      },
+      {
+        "command": "ld-java-analyze.jarCandidates",
+        "title": "ld-java-analyze: 列出同名类所在的 JAR"
+      },
+      {
+        "command": "ld-java-analyze.editExcludeRules",
+        "title": "ld-java-analyze: 编辑扫描排除规则 (.ld-java-analyze/ignore)"
+      },
+      {
+        "command": "ld-java-analyze.setLogDir",
+        "title": "ld-java-analyze: 设置日志输出目录"
+      },
+      {
+        "command": "ld-java-analyze.reindex",
+        "title": "ld-java-analyze: 重建索引"
+      },
+      {
+        "command": "ld-java-analyze.stats",
+        "title": "ld-java-analyze: 查看索引状态"
+      },
+      {
+        "command": "ld-java-analyze.selfTest",
+        "title": "ld-java-analyze: 自检所有命令"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "editorLangId == java || editorLangId == xml",
+          "command": "ld-java-analyze.referencesInPaths",
+          "group": "navigation@1"
+        },
+        {
+          "when": "editorLangId == java",
+          "command": "ld-java-analyze.jarCandidates",
+          "group": "navigation@2"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc -p ./ --noEmit",
+    "compile": "tsc -p ./",
+    "watch": "tsc -p ./ -w",
+    "vsix": "npm run compile && vsce package --allow-missing-repository --out ld-java-analyze-0.1.0.vsix",
+    "install:local": "code --install-extension ld-java-analyze-0.1.0.vsix --force"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^4.1.0",
+    "typescript": "^5.5.0"
+  }
+}

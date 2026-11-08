@@ -1,0 +1,23 @@
+.idea
+.vscode
+/node_modules
+# Rust
+/target/
+**/*.rs.bk
+
+# Runtime state (always inside the workspace; never in the user profile)
+.ld-java-analyze/
+**/.ld-java-analyze/
+
+# VS Code extension
+editors/vscode/node_modules/
+editors/vscode/out/
+editors/vscode/server/
+
+# Maven build output inside test projects
+testdata/**/target/
+
+# Diagnostics and editor noise
+*.log
+.vscode/
+.DS_Store

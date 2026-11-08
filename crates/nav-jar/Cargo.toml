@@ -1,0 +1,10 @@
+[package]
+name = "nav-jar"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+nav-core = { workspace = true }
+zip = "7.3.0"

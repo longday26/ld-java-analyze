@@ -1,0 +1,35 @@
+# 把本文件复制到 <VS Code 工作区根>/.ld-java-analyze/classpath.txt
+# 内容由用户自己用 Maven 生成，插件只读，不会执行 mvn、不会联网、不会下载源码。
+#
+# === 推荐：在项目根运行 scripts/setup-classpath.ps1（Linux/macOS 用 .sh）===
+# 脚本自动建目录、install、下载 sources、挑依赖最全的模块并写绝对路径，
+# 无需手写模块名。下面只是手写等价命令，供排查或定制时参考。
+#
+# === 多模块项目（只生成一份）===
+# PowerShell（-D 参数必须加引号，否则会被拆成两个参数）：
+#   New-Item -ItemType Directory -Force .ld-java-analyze
+#   mvn -q -U install "-DskipTests"          # 先装 reactor 内部 *-SNAPSHOT 模块
+#   mvn -q dependency:sources
+#   mvn -q -pl demo1-web dependency:build-classpath "-Dmdep.outputFile=E:/projects/vsjavapro/demo1/.ld-java-analyze/classpath.txt"
+#
+# 注意：不要在 reactor 根执行不带 -pl 的相对路径命令
+#   mvn -q dependency:build-classpath "-Dmdep.outputFile=.ld-java-analyze/classpath.txt"
+# 这会对每个模块各跑一次，结果是 demo1-common/.ld-java-analyze/、demo1-utils/.ld-java-analyze/ ... 各一份，
+# 而工作区根那份只来自父 pom（通常只有 junit），插件读到的恰好是最没用的一份。
+# -pl 只跑一个模块 + 绝对路径输出 => 只有工作区根一份，且依赖最全。
+#
+# 清理误生成的多余目录（保留工作区根的 .ld-java-analyze）：
+#   @('demo1-common','demo1-service','demo1-utils','demo1-web') | ForEach-Object {
+#       Remove-Item -LiteralPath "$_\.ld-java-analyze" -Recurse -Force -ErrorAction SilentlyContinue }
+#
+# === 单模块项目 ===
+#   New-Item -ItemType Directory -Force .ld-java-analyze
+#   mvn -q dependency:build-classpath "-Dmdep.outputFile=.ld-java-analyze/classpath.txt"
+#   mvn dependency:sources
+# cmd / bash 下 -D 参数不需要引号。
+#
+# 命令在哪个目录执行，VS Code 就打开哪个目录作为工作区。
+
+# classpath.txt 内容：一行，路径之间用 ; (Windows) 或 : (Linux/macOS) 分隔，也可写多行。
+# 示例：
+# D:/software/portables/mavenapp/repository/com/google/guava/guava/31.1-jre/guava-31.1-jre.jar;D:/software/portables/mavenapp/repository/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar

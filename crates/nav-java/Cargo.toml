@@ -1,0 +1,12 @@
+[package]
+name = "nav-java"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+nav-core = { workspace = true }
+roxmltree = "0.21.2"
+tree-sitter = "0.26.13"
+tree-sitter-java = "0.23.5"
