@@ -9,9 +9,11 @@ Java 8 / Maven 代码导航扩展：VS Code 薄客户端 + 随扩展附带的原
 ## 使用
 
 1. 把**被索引的项目根**作为 VS Code 工作区打开（多模块项目打开最外层带 `pom.xml` 的目录）。
-2. 用 Maven 自行生成 `<工作区根>/.ld-java-analyze/classpath.txt` 与 `*-sources.jar`。
-   扩展不启动 Maven、不联网、不下载源码；**多模块项目必须用 `-pl` + 绝对路径**，
-   完整命令见项目根 `README.md` 的「配置被索引的项目」。
+2. 在**被索引项目根**运行仓库自带的 `scripts/setup-classpath.ps1`
+   （Linux / macOS 用 `setup-classpath.sh`），自动生成
+   `<工作区根>/.ld-java-analyze/classpath.txt` 与 `*-sources.jar`。
+   扩展不启动 Maven、不联网、不下载源码；脚本会自动挑依赖最全的模块并用绝对路径输出，
+   详见项目根 `README.md` 的「配置」。
 3. 打开任意 `.java` / `.xml` 文件即激活。命令面板跑
    `ld-java-analyze: 自检所有命令` 与 `ld-java-analyze: 查看索引状态` 确认索引与 classpath 已加载。
 
@@ -40,5 +42,5 @@ Java 8 / Maven 代码导航扩展：VS Code 薄客户端 + 随扩展附带的原
 命令无反应先执行 `Developer: Reload Window`，再跑 `自检所有命令`；
 索引或跳转异常看 `<工作区根>/.ld-java-analyze/logs/` 与输出面板。
 
-完整的**构建 → 调整插件 → 打包安装 → 使用验证**流程见项目根 `README.md`，
-迭代规范见 `AGENT.md`。
+完整的**构建 → 调整插件 → 打包安装 → 使用验证**流程见项目根 `README.md`
+的「从源码构建」，迭代规范见 `AGENT.md`。

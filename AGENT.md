@@ -8,14 +8,14 @@
 
 | 遇到这些分支时 | 读 |
 | --- | --- |
-| 改构建、打包、安装流程；新增发布步骤 | `README.md` 的「快速开始」 |
+| 改构建、打包、安装流程；新增发布步骤 | `README.md` 的「快速上手」与「从源码构建」 |
 | 改 classpath / sources jar 生成流程 | `scripts/setup-classpath.ps1` 与 `scripts/setup-classpath.sh`（README 只讲用法） |
 | 新增/改名自定义命令、改 capabilities | `crates/ld-java-analyze/src/backend.rs` 的 `COMMANDS` 与 `initialize` |
 | 改扫描规则、配置项、保留策略 | `crates/nav-core/src/scan_rules.rs` 与 `crates/ld-java-analyze/src/logger.rs` |
 | 改名字绑定、重载选择、索引查询 | `crates/nav-index/src/lib.rs` 的 `resolve_unresolved` / `symbol_at` |
 | 加框架跳转 | `crates/nav-java/src/mybatis.rs`（`Link` 范式）、`lombok.rs`（合成符号范式） |
 | 改验证闸门 | `.github/workflows/ci.yml` |
-| 解答本机安装/试用问题 | `README.md` 的「快速开始」步骤 3–4 与「验收与排障」 |
+| 解答本机安装/试用问题 | `README.md` 的「快速上手」与「验证与排障」 |
 
 ## 硬边界
 
