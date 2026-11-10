@@ -1,0 +1,68 @@
+{
+  "name": "ld-java-next",
+  "displayName": "ld-java-next",
+  "description": "Independent Java navigation extension for the next-generation index: definition, implementation, references, and method search.",
+  "version": "0.1.0",
+  "publisher": "local",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onLanguage:java",
+    "onCommand:ld-java-next.searchMethods",
+    "onCommand:ld-java-next.stats",
+    "onCommand:ld-java-next.reindex",
+    "onCommand:ld-java-next.reindexPaths"
+  ],
+  "contributes": {
+    "configuration": {
+      "title": "ld-java-next",
+      "properties": {
+        "ld-java-next.serverPath": {
+          "type": "string",
+          "default": "",
+          "description": "Absolute path to the ld-java-next server executable. Leave empty to use the bundled server/ld-java-next(.exe)."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "ld-java-next.searchMethods",
+        "title": "ld-java-next: Search methods by full path"
+      },
+      {
+        "command": "ld-java-next.stats",
+        "title": "ld-java-next: Show index stats"
+      },
+      {
+        "command": "ld-java-next.reindex",
+        "title": "ld-java-next: Rebuild index"
+      },
+      {
+        "command": "ld-java-next.reindexPaths",
+        "title": "ld-java-next: Refresh directory index"
+      }
+    ]
+  },
+  "scripts": {
+    "typecheck": "tsc -p ./ --noEmit",
+    "compile": "tsc -p ./",
+    "watch": "tsc -p ./ -w",
+    "vsix": "npm run compile && vsce package --allow-missing-repository --out ld-java-next-0.1.0.vsix"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^4.1.0",
+    "typescript": "^5.5.0"
+  }
+}

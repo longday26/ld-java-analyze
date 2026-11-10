@@ -1,0 +1,5 @@
+test/**
+src/**
+tsconfig.json
+.ld-java-next/**
+**/*.map

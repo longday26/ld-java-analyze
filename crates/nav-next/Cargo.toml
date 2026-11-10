@@ -1,0 +1,18 @@
+[package]
+name = "nav-next"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+arc-swap = "1"
+blake3 = "1"
+postcard = { version = "1", features = ["alloc"] }
+redb = "4"
+serde = { version = "1", features = ["derive"] }
+tree-sitter = "0.26.13"
+tree-sitter-java = "0.23"
+
+[dev-dependencies]
+tempfile = "3"

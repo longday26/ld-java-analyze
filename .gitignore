@@ -10,9 +10,9 @@
 **/.ld-java-analyze/
 
 # VS Code extension
-editors/vscode/node_modules/
-editors/vscode/out/
-editors/vscode/server/
+editors/vscode-next/node_modules/
+editors/vscode-next/out/
+editors/vscode-next/server/
 
 # Maven build output inside test projects
 testdata/**/target/
